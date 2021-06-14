@@ -1,0 +1,25 @@
+{
+  "name": "@reactificate/clientside",
+  "version": "0.0.1",
+  "description": "Reactificate clientside",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reactificate/clientside.git"
+  },
+  "keywords": [
+    "reactificate",
+    "clientside",
+    "websocket",
+    "notification"
+  ],
+  "author": "ahmard",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reactificate/clientside/issues"
+  },
+  "homepage": "https://github.com/reactificate/clientside#readme"
+}
