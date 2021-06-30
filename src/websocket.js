@@ -1,8 +1,10 @@
 const EventEmitter = require('./eventemitter');
 const Notification = require('./notification');
 
-if (typeof window === 'undefined'){
-    window = {}; window.addEventListener = () => {};
+if (typeof window === 'undefined') {
+    window = {};
+    window.addEventListener = () => {
+    };
 }
 
 /**
@@ -21,6 +23,9 @@ module.exports = (function () {
         let reconnectionInterval = 1000;
         let connectionState = 'standby';
         let willReconnect = true;
+
+        let defaultAuthToken = null;
+        let reconnectionTimeout = null;
 
         /**
          * Log message to console
@@ -70,14 +75,21 @@ module.exports = (function () {
         let changeState = function (stateName, event) {
             connectionState = stateName;
 
-            if ('close' === stateName) {
-                if (willReconnect) {
-                    _this.reconnect();
-                }
+            if ('close' === stateName && willReconnect) {
+                _this.reconnect();
             }
 
             _event.dispatch(stateName, [event]);
         };
+
+        let close = function (reconnect = false) {
+            if (reconnect) {
+                willReconnect = true;
+                connectionState = 'internal_reconnection';
+            }
+
+            websocket.close();
+        }
 
         /**
          * Check if connection is opened
@@ -112,7 +124,11 @@ module.exports = (function () {
          * @param listener
          */
         this.onMessage = (listener) => _event.on('message', (payload) => {
-            listener(JSON.parse(payload.data), payload);
+            if ('string' === typeof payload.data) {
+                listener(JSON.parse(payload.data), payload)
+            } else {
+                listener(payload, payload);
+            }
         });
 
         /**
@@ -165,26 +181,27 @@ module.exports = (function () {
         };
 
         /**
+         * Set an authentication token that will be included in each outgoing message
+         *
+         * @param token {string} authentication token
+         */
+        this.setAuthToken = function (token) {
+            defaultAuthToken = token;
+        };
+
+        /**
          * Send message to websocket server
          * @param command {string} command name
          * @param message {array|object|int|float|string} message
          * @return Promise
          */
         this.send = function (command, message = {}) {
-            if ('object' === typeof command) {  //when array|object is passed to command
-                if (!Array.isArray(command)) {
-                    command['time'] = new Date().getTime();
-                }
-
-                command = JSON.stringify(command);
-
-            } else {    // when string is passed to command
-                command = JSON.stringify({
-                    command: command,
-                    message: message,
-                    time: new Date().getTime()
-                });
-            }
+            command = JSON.stringify({
+                command: command,
+                message: message,
+                time: new Date().getTime(),
+                token: defaultAuthToken
+            });
 
             //Send message
             return new Promise((resolve, reject) => {
@@ -216,11 +233,13 @@ module.exports = (function () {
          * Manually reconnect this connection
          */
         this.reconnect = function () {
-            connectionState = 'internal_reconnection';
-            this.close();
+            close(true);
 
             if (false !== reconnectionInterval) {
-                setTimeout(() => createSocket(true), reconnectionInterval);
+                reconnectionTimeout = setTimeout(
+                    () => createSocket(true),
+                    reconnectionInterval
+                );
             }
         };
 
@@ -228,11 +247,9 @@ module.exports = (function () {
          * Close this connection, the connection will not be reconnected.
          */
         this.close = function () {
-            if ('internal_reconnection' === connectionState) {
-                willReconnect = true;
-            }
-
-            websocket.close();
+            willReconnect = false;
+            close(false)
+            clearTimeout(reconnectionTimeout);
         };
 
         //CREATE SOCKET CONNECTION WHEN DOM FINISHED LOADING

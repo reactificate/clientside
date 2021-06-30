@@ -1,7 +1,5 @@
-let Reactificate = {}
-
-Reactificate.EventEmitter = require('./src/eventemitter');
-Reactificate.Websocket = require('./src/websocket');
-Reactificate.Notification = require('./src/notification');
-
-module.exports = Reactificate;
+module.exports = {
+    EventEmitter: require('./src/eventemitter'),
+    Websocket: require('./src/websocket'),
+    Notification: require('./src/notification')
+};
