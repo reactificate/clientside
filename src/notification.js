@@ -26,15 +26,15 @@ module.exports = (function () {
         this.getNotification = () => _notification;
 
         this.isDefault = function () {
-            return 'default' === RNotification.permission;
+            return 'default' === Notification.permission;
         };
 
         this.isGranted = function () {
-            return 'granted' === RNotification.permission;
+            return 'granted' === Notification.permission;
         };
 
         this.isDeclined = function () {
-            return 'declined' === RNotification.permission;
+            return 'declined' === Notification.permission;
         };
 
 
