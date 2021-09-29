@@ -262,15 +262,7 @@ module.exports = (function () {
                     _event.dispatch('command', [payload]);
 
                     if ('Reactificate.Notification' === payload.command) {
-                        let notification = new Notification();
-
-                        if ('' !== payload.data.redirect) {
-                            notification.getNotification().addEventListener('click', () => {
-                                window.location = payload.data.redirect;
-                            });
-                        }
-
-                        notification.send(payload.data);
+                        (new Notification()).send(payload.data);
                     }
                 }
             });

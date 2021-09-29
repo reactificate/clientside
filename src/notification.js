@@ -21,6 +21,12 @@ module.exports = (function () {
 
         this.send = function (object) {
             _notification = new Notification(object.title, object);
+
+            if (object.hasOwnProperty('redirect')) {
+                _notification.addEventListener('click', () => {
+                    window.location = object.redirect;
+                });
+            }
         }
 
         this.getNotification = () => _notification;
