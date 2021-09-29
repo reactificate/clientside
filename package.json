@@ -1,6 +1,6 @@
 {
   "name": "@reactificate/clientside",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Reactificate clientside",
   "main": "index.js",
   "scripts": {

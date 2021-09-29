@@ -265,7 +265,7 @@ module.exports = (function () {
                         let notification = new Notification();
 
                         if ('' !== payload.data.redirect) {
-                            notification.addEventListener('click', () => {
+                            notification.getNotification().addEventListener('click', () => {
                                 window.location = payload.data.redirect;
                             });
                         }
