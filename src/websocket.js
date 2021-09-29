@@ -261,11 +261,16 @@ module.exports = (function () {
                     //Dispatch command events
                     _event.dispatch('command', [payload]);
 
-                    if ('reactificate.notification' === payload.command) {
-                        new Notification().send({
-                            title: payload.data.title,
-                            body: payload.data.body
-                        });
+                    if ('Reactificate.Notification' === payload.command) {
+                        let notification = new Notification();
+
+                        if ('' !== payload.data.redirect) {
+                            notification.addEventListener('click', () => {
+                                window.location = payload.data.redirect;
+                            });
+                        }
+
+                        notification.send(payload.data);
                     }
                 }
             });
